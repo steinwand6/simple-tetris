@@ -48,7 +48,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         while event::poll(Duration::default())? {
             if let Event::Key(key_event) = event::read()? {
                 match key_event.code {
-                    KeyCode::Down => mino.go_down(),
+                    KeyCode::Down => mino.go_down(&curr_frame),
+                    KeyCode::Right => mino.go_right(&curr_frame),
+                    KeyCode::Left => mino.go_left(&curr_frame),
                     KeyCode::Esc | KeyCode::Char('q') => {
                         break 'game_play;
                     }

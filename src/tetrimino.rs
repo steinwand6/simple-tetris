@@ -1,6 +1,6 @@
 use crate::{
     frame::{Drawable, Frame},
-    NUM_ROWS,
+    NUM_COLS, NUM_ROWS,
 };
 
 pub enum minotype {
@@ -26,19 +26,53 @@ impl Tetrimino {
         }
     }
 
-    pub fn go_down(&mut self) {
+    pub fn go_down(&mut self, frame: &Frame) {
         if self.moving {
             let new_xy: Vec<(usize, usize)> = self.xy.iter().map(|(x, y)| (*x, *y + 1)).collect();
+
+            if new_xy.iter().any(|(x, y)| frame[*x][*y] == "@") {
+                return;
+            }
             self.xy = new_xy;
             let bottom = self.xy.iter().map(|(_, y)| *y).max().unwrap_or(0);
-            if bottom > NUM_ROWS / 2 - 2 {
+            if bottom >= NUM_ROWS - 1 {
                 self.moving = false;
             }
         }
     }
 
+    pub fn go_right(&mut self, frame: &Frame) {
+        if self.moving {
+            let new_xy: Vec<(usize, usize)> = self.xy.iter().map(|(x, y)| (*x + 1, *y)).collect();
+
+            let right = self.xy.iter().map(|(x, _)| *x).max().unwrap_or(0);
+            if right >= NUM_COLS - 1 {
+                return;
+            }
+            if new_xy.iter().any(|(x, y)| frame[*x][*y] == "@") {
+                return;
+            }
+
+            self.xy = new_xy;
+        }
+    }
+    pub fn go_left(&mut self, frame: &Frame) {
+        if self.moving {
+            let left = self.xy.iter().map(|(x, _)| *x).min().unwrap_or(0);
+            if left == 0 {
+                return;
+            }
+            if self.xy.iter().any(|(x, y)| frame[*x][*y] == "@") {
+                return;
+            }
+            let new_xy: Vec<(usize, usize)> = self.xy.iter().map(|(x, y)| (*x - 1, *y)).collect();
+
+            self.xy = new_xy;
+        }
+    }
+
     fn generate_mino(minotype: minotype) -> Vec<(usize, usize)> {
-        let left_x = (NUM_ROWS) / 2 - 1;
+        let left_x = (NUM_COLS) / 2 - 1;
         let top_y = 0;
         match minotype {
             minotype::I => vec![
