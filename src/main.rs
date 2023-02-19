@@ -13,6 +13,7 @@ use crossterm::{
     ExecutableCommand,
 };
 use simple_tetris::{
+    fixed_block::{self, FixedBlock},
     frame::{init_frame, Drawable},
     render::render,
     tetrimino::{minotype, Tetrimino},
@@ -42,16 +43,19 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     });
 
-    let mut mino = Tetrimino::new(minotype::T);
+    let mut mino = Tetrimino::new();
     let mut instant = Instant::now();
+    let mut fixed_block: FixedBlock = vec![];
 
     'game_play: loop {
         let delta = instant.elapsed();
         instant = Instant::now();
         let mut curr_frame = init_frame();
         if !mino.moving {
-            mino = Tetrimino::new(minotype::I);
+            fixed_block.append(&mut mino.xy);
+            mino = Tetrimino::new();
         }
+        fixed_block.draw(&mut curr_frame);
 
         // input
         while event::poll(Duration::default())? {

@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use rand::Rng;
 use rusty_time::Timer;
 
 use crate::{
@@ -24,9 +25,9 @@ pub struct Tetrimino {
 }
 
 impl Tetrimino {
-    pub fn new(minotype: minotype) -> Self {
+    pub fn new() -> Self {
         Self {
-            xy: Self::generate_mino(minotype),
+            xy: Self::generate_mino(),
             moving: true,
             timer: Timer::from_millis(1000),
         }
@@ -48,7 +49,8 @@ impl Tetrimino {
                 self.moving = false;
                 return;
             }
-            if new_xy.iter().any(|(x, y)| frame[*x][*y] == "@") {
+            if new_xy.iter().any(|(x, y)| frame[*x][*y] != " ") {
+                self.moving = false;
                 return;
             }
             self.xy = new_xy;
@@ -85,9 +87,25 @@ impl Tetrimino {
         }
     }
 
-    fn generate_mino(minotype: minotype) -> Vec<(usize, usize)> {
+    pub fn random_mino() -> minotype {
+        let mut rng = rand::thread_rng();
+        let random_num = rng.gen_range(0..=6);
+        match random_num {
+            0 => minotype::I,
+            1 => minotype::O,
+            2 => minotype::S,
+            3 => minotype::Z,
+            4 => minotype::J,
+            5 => minotype::L,
+            6 => minotype::T,
+            _ => unreachable!(),
+        }
+    }
+
+    fn generate_mino() -> Vec<(usize, usize)> {
         let left_x = (NUM_COLS) / 2 - 1;
         let top_y = 0;
+        let minotype = Self::random_mino();
         match minotype {
             minotype::I => vec![
                 (left_x, top_y),
@@ -138,7 +156,7 @@ impl Tetrimino {
 impl Drawable for Tetrimino {
     fn draw(&self, frame: &mut crate::frame::Frame) {
         for (x, y) in self.xy.iter() {
-            frame[*x][*y] = "@";
+            frame[*x][*y] = "0";
         }
     }
 }
