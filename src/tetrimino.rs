@@ -1,4 +1,7 @@
-use crate::{frame::Drawable, NUM_ROWS};
+use crate::{
+    frame::{Drawable, Frame},
+    NUM_ROWS,
+};
 
 pub enum minotype {
     I,
@@ -20,6 +23,17 @@ impl Tetrimino {
         Self {
             xy: Self::generate_mino(minotype),
             moving: true,
+        }
+    }
+
+    pub fn go_down(&mut self) {
+        if self.moving {
+            let new_xy: Vec<(usize, usize)> = self.xy.iter().map(|(x, y)| (*x, *y + 1)).collect();
+            self.xy = new_xy;
+            let bottom = self.xy.iter().map(|(_, y)| *y).max().unwrap_or(0);
+            if bottom > NUM_ROWS / 2 - 2 {
+                self.moving = false;
+            }
         }
     }
 
