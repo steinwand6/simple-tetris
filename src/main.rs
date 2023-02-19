@@ -6,7 +6,11 @@ use crossterm::{
     terminal::{self, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
 };
-use simple_tetris::{frame::init_frame, render::render};
+use simple_tetris::{
+    frame::{init_frame, Drawable},
+    render::render,
+    tetrimino::{minotype, Tetrimino},
+};
 
 fn main() -> Result<(), Box<dyn Error>> {
     // terminal
@@ -16,10 +20,12 @@ fn main() -> Result<(), Box<dyn Error>> {
     stdout.execute(Hide)?;
 
     let (tx, rx) = mpsc::channel();
+
     let render_handler = thread::spawn(move || {
-        let mut last_frame = init_frame();
         let mut stdout = io::stdout();
+        let mut last_frame = init_frame();
         render(&mut stdout, &last_frame, &last_frame, true);
+
         loop {
             let curr_frame = match rx.recv() {
                 Ok(x) => x,
@@ -30,8 +36,13 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     });
 
+    let mut mino = Tetrimino::new(minotype::O);
+
     'game_play: loop {
-        let curr_frame = init_frame();
+        let mut curr_frame = init_frame();
+        if !mino.moving {
+            mino = Tetrimino::new(minotype::O);
+        }
 
         // input
         while event::poll(Duration::default())? {
@@ -44,6 +55,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 }
             }
         }
+        mino.draw(&mut curr_frame);
         let _ = tx.send(curr_frame);
         thread::sleep(Duration::from_millis(1));
     }

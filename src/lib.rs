@@ -3,3 +3,4 @@ const NUM_COLS: usize = 10 * 2;
 
 pub mod frame;
 pub mod render;
+pub mod tetrimino;
