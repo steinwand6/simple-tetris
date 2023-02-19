@@ -36,12 +36,12 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
     });
 
-    let mut mino = Tetrimino::new(minotype::O);
+    let mut mino = Tetrimino::new(minotype::T);
 
     'game_play: loop {
         let mut curr_frame = init_frame();
         if !mino.moving {
-            mino = Tetrimino::new(minotype::O);
+            mino = Tetrimino::new(minotype::I);
         }
 
         // input

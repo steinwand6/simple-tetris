@@ -21,10 +21,6 @@ pub fn render(stdout: &mut Stdout, curr_frame: &Frame, last_frame: &Frame, force
                 stdout.queue(MoveTo(y as u16, x as u16)).unwrap();
                 print!("{}", *s);
             }
-            if *s == "@" {
-                stdout.queue(MoveTo(y as u16, x as u16)).unwrap();
-                print!("{}", *s);
-            }
         }
     }
     stdout.flush().unwrap();

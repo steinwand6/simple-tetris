@@ -17,19 +17,58 @@ pub struct Tetrimino {
 
 impl Tetrimino {
     pub fn new(minotype: minotype) -> Self {
-        let left_x = NUM_ROWS / 2;
-        let top_y = 0;
         Self {
-            xy: match minotype {
-                minotype::O => vec![
-                    (left_x, top_y),
-                    (left_x + 1, top_y),
-                    (left_x, top_y + 1),
-                    (left_x + 1, top_y + 1),
-                ],
-                _ => unreachable!(),
-            },
+            xy: Self::generate_mino(minotype),
             moving: true,
+        }
+    }
+
+    fn generate_mino(minotype: minotype) -> Vec<(usize, usize)> {
+        let left_x = (NUM_ROWS) / 2 - 1;
+        let top_y = 0;
+        match minotype {
+            minotype::I => vec![
+                (left_x, top_y),
+                (left_x, top_y + 1),
+                (left_x, top_y + 2),
+                (left_x, top_y + 3),
+            ],
+            minotype::O => vec![
+                (left_x, top_y),
+                (left_x + 1, top_y),
+                (left_x, top_y + 1),
+                (left_x + 1, top_y + 1),
+            ],
+            minotype::S => vec![
+                (left_x + 1, top_y),
+                (left_x + 2, top_y),
+                (left_x, top_y + 1),
+                (left_x + 1, top_y + 1),
+            ],
+            minotype::Z => vec![
+                (left_x, top_y),
+                (left_x + 1, top_y),
+                (left_x + 1, top_y + 1),
+                (left_x + 2, top_y + 1),
+            ],
+            minotype::J => vec![
+                (left_x + 1, top_y),
+                (left_x + 1, top_y + 1),
+                (left_x + 1, top_y + 2),
+                (left_x, top_y + 2),
+            ],
+            minotype::L => vec![
+                (left_x, top_y),
+                (left_x, top_y + 1),
+                (left_x, top_y + 2),
+                (left_x + 1, top_y + 2),
+            ],
+            minotype::T => vec![
+                (left_x + 1, top_y),
+                (left_x, top_y + 1),
+                (left_x + 1, top_y + 1),
+                (left_x + 2, top_y + 1),
+            ],
         }
     }
 }
