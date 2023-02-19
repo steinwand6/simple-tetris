@@ -1,4 +1,10 @@
-use std::{error::Error, io, sync::mpsc, thread, time::Duration};
+use std::{
+    error::Error,
+    io,
+    sync::mpsc,
+    thread,
+    time::{Duration, Instant},
+};
 
 use crossterm::{
     cursor::Hide,
@@ -37,8 +43,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     });
 
     let mut mino = Tetrimino::new(minotype::T);
+    let mut instant = Instant::now();
 
     'game_play: loop {
+        let delta = instant.elapsed();
+        instant = Instant::now();
         let mut curr_frame = init_frame();
         if !mino.moving {
             mino = Tetrimino::new(minotype::I);
@@ -58,6 +67,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                 }
             }
         }
+        mino.update(&curr_frame, delta);
         mino.draw(&mut curr_frame);
         let _ = tx.send(curr_frame);
         thread::sleep(Duration::from_millis(1));

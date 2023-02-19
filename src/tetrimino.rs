@@ -1,3 +1,7 @@
+use std::time::Duration;
+
+use rusty_time::Timer;
+
 use crate::{
     frame::{Drawable, Frame},
     NUM_COLS, NUM_ROWS,
@@ -16,6 +20,7 @@ pub enum minotype {
 pub struct Tetrimino {
     pub xy: Vec<(usize, usize)>,
     pub moving: bool,
+    timer: Timer,
 }
 
 impl Tetrimino {
@@ -23,21 +28,30 @@ impl Tetrimino {
         Self {
             xy: Self::generate_mino(minotype),
             moving: true,
+            timer: Timer::from_millis(1000),
+        }
+    }
+
+    pub fn update(&mut self, frame: &Frame, delta: Duration) {
+        self.timer.update(delta);
+        if self.timer.ready {
+            self.timer.reset();
+            self.go_down(frame);
         }
     }
 
     pub fn go_down(&mut self, frame: &Frame) {
         if self.moving {
             let new_xy: Vec<(usize, usize)> = self.xy.iter().map(|(x, y)| (*x, *y + 1)).collect();
-
+            let bottom = new_xy.iter().map(|(_, y)| *y).max().unwrap_or(0);
+            if bottom > NUM_ROWS - 1 {
+                self.moving = false;
+                return;
+            }
             if new_xy.iter().any(|(x, y)| frame[*x][*y] == "@") {
                 return;
             }
             self.xy = new_xy;
-            let bottom = self.xy.iter().map(|(_, y)| *y).max().unwrap_or(0);
-            if bottom >= NUM_ROWS - 1 {
-                self.moving = false;
-            }
         }
     }
 
