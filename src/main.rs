@@ -13,10 +13,10 @@ use crossterm::{
     ExecutableCommand,
 };
 use simple_tetris::{
-    fixed_block::{self, FixedBlock},
-    frame::{init_frame, Drawable},
+    fixed_block::FixedBlock,
+    frame::{init_frame, Drawable, Frame},
     render::render,
-    tetrimino::{minotype, Tetrimino},
+    tetrimino::Tetrimino,
 };
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -42,12 +42,20 @@ fn main() -> Result<(), Box<dyn Error>> {
             last_frame = curr_frame;
         }
     });
+    game_play(tx)?;
 
+    terminal::disable_raw_mode()?;
+    stdout.execute(LeaveAlternateScreen)?;
+    drop(render_handler);
+    Ok(())
+}
+
+fn game_play(tx: mpsc::Sender<Frame>) -> Result<(), Box<dyn Error>> {
     let mut mino = Tetrimino::new();
     let mut instant = Instant::now();
     let mut fixed_block: FixedBlock = vec![];
 
-    'game_play: loop {
+    loop {
         let delta = instant.elapsed();
         instant = Instant::now();
         let mut curr_frame = init_frame();
@@ -65,7 +73,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     KeyCode::Right => mino.go_right(&curr_frame),
                     KeyCode::Left => mino.go_left(&curr_frame),
                     KeyCode::Esc | KeyCode::Char('q') => {
-                        break 'game_play;
+                        return Ok(());
                     }
                     _ => (),
                 }
@@ -76,9 +84,4 @@ fn main() -> Result<(), Box<dyn Error>> {
         let _ = tx.send(curr_frame);
         thread::sleep(Duration::from_millis(1));
     }
-
-    terminal::disable_raw_mode()?;
-    stdout.execute(LeaveAlternateScreen)?;
-    drop(render_handler);
-    Ok(())
 }
