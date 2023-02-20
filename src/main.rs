@@ -13,7 +13,7 @@ use crossterm::{
     ExecutableCommand,
 };
 use simple_tetris::{
-    fixed_block::FixedBlock,
+    fixed_block::{update_block, FixedBlock},
     frame::{init_frame, Drawable, Frame},
     render::render,
     tetrimino::Tetrimino,
@@ -80,6 +80,7 @@ fn game_play(tx: mpsc::Sender<Frame>) -> Result<(), Box<dyn Error>> {
             }
         }
         mino.update(&curr_frame, delta);
+        update_block(&mut fixed_block);
         mino.draw(&mut curr_frame);
         let _ = tx.send(curr_frame);
         thread::sleep(Duration::from_millis(1));
