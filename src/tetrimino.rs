@@ -59,13 +59,13 @@ impl Tetrimino {
 
     pub fn go_right(&mut self, frame: &Frame) {
         if self.moving {
+            let right = self.xy.iter().map(|(x, _)| *x).max().unwrap_or(0);
             let new_xy: Vec<(usize, usize)> = self.xy.iter().map(|(x, y)| (*x + 1, *y)).collect();
 
-            let right = self.xy.iter().map(|(x, _)| *x).max().unwrap_or(0);
             if right >= NUM_COLS - 1 {
                 return;
             }
-            if new_xy.iter().any(|(x, y)| frame[*x][*y] == "@") {
+            if new_xy.iter().any(|(x, y)| frame[*x][*y] != " ") {
                 return;
             }
 
@@ -78,10 +78,11 @@ impl Tetrimino {
             if left == 0 {
                 return;
             }
-            if self.xy.iter().any(|(x, y)| frame[*x][*y] == "@") {
+            let new_xy: Vec<(usize, usize)> = self.xy.iter().map(|(x, y)| (*x - 1, *y)).collect();
+
+            if new_xy.iter().any(|(x, y)| frame[*x][*y] != " ") {
                 return;
             }
-            let new_xy: Vec<(usize, usize)> = self.xy.iter().map(|(x, y)| (*x - 1, *y)).collect();
 
             self.xy = new_xy;
         }
