@@ -2,7 +2,7 @@ use std::{
     error::Error,
     io,
     sync::mpsc,
-    thread,
+    thread::{self, JoinHandle},
     time::{Duration, Instant},
 };
 
@@ -27,23 +27,10 @@ fn main() -> Result<(), Box<dyn Error>> {
     stdout.execute(Hide)?;
 
     let (tx, rx) = mpsc::channel();
-
-    let render_handler = thread::spawn(move || {
-        let mut stdout = io::stdout();
-        let mut last_frame = init_frame();
-        render(&mut stdout, &last_frame, &last_frame, true);
-
-        loop {
-            let curr_frame = match rx.recv() {
-                Ok(x) => x,
-                Err(_) => break,
-            };
-            render(&mut stdout, &curr_frame, &last_frame, false);
-            last_frame = curr_frame;
-        }
-    });
+    let render_handler = render_hander(rx);
     game_play(tx)?;
 
+    // cleanup
     terminal::disable_raw_mode()?;
     stdout.execute(LeaveAlternateScreen)?;
     drop(render_handler);
@@ -84,4 +71,21 @@ fn game_play(tx: mpsc::Sender<Frame>) -> Result<(), Box<dyn Error>> {
         let _ = tx.send(curr_frame);
         thread::sleep(Duration::from_millis(1));
     }
+}
+
+fn render_hander(rx: mpsc::Receiver<Frame>) -> JoinHandle<()> {
+    thread::spawn(move || {
+        let mut stdout = io::stdout();
+        let mut last_frame = init_frame();
+        render(&mut stdout, &last_frame, &last_frame, true);
+
+        loop {
+            let curr_frame = match rx.recv() {
+                Ok(x) => x,
+                Err(_) => break,
+            };
+            render(&mut stdout, &curr_frame, &last_frame, false);
+            last_frame = curr_frame;
+        }
+    })
 }
