@@ -8,7 +8,7 @@ use crate::{
     NUM_COLS, NUM_ROWS,
 };
 
-pub enum minotype {
+pub enum Minotype {
     I,
     O,
     S,
@@ -87,17 +87,17 @@ impl Tetrimino {
         }
     }
 
-    pub fn random_mino() -> minotype {
+    pub fn random_mino() -> Minotype {
         let mut rng = rand::thread_rng();
         let random_num = rng.gen_range(0..=6);
         match random_num {
-            0 => minotype::I,
-            1 => minotype::O,
-            2 => minotype::S,
-            3 => minotype::Z,
-            4 => minotype::J,
-            5 => minotype::L,
-            6 => minotype::T,
+            0 => Minotype::I,
+            1 => Minotype::O,
+            2 => Minotype::S,
+            3 => Minotype::Z,
+            4 => Minotype::J,
+            5 => Minotype::L,
+            6 => Minotype::T,
             _ => unreachable!(),
         }
     }
@@ -107,43 +107,43 @@ impl Tetrimino {
         let top_y = 0;
         let minotype = Self::random_mino();
         match minotype {
-            minotype::I => vec![
+            Minotype::I => vec![
                 (left_x, top_y),
                 (left_x, top_y + 1),
                 (left_x, top_y + 2),
                 (left_x, top_y + 3),
             ],
-            minotype::O => vec![
+            Minotype::O => vec![
                 (left_x, top_y),
                 (left_x + 1, top_y),
                 (left_x, top_y + 1),
                 (left_x + 1, top_y + 1),
             ],
-            minotype::S => vec![
+            Minotype::S => vec![
                 (left_x + 1, top_y),
                 (left_x + 2, top_y),
                 (left_x, top_y + 1),
                 (left_x + 1, top_y + 1),
             ],
-            minotype::Z => vec![
+            Minotype::Z => vec![
                 (left_x, top_y),
                 (left_x + 1, top_y),
                 (left_x + 1, top_y + 1),
                 (left_x + 2, top_y + 1),
             ],
-            minotype::J => vec![
+            Minotype::J => vec![
                 (left_x + 1, top_y),
                 (left_x + 1, top_y + 1),
                 (left_x + 1, top_y + 2),
                 (left_x, top_y + 2),
             ],
-            minotype::L => vec![
+            Minotype::L => vec![
                 (left_x, top_y),
                 (left_x, top_y + 1),
                 (left_x, top_y + 2),
                 (left_x + 1, top_y + 2),
             ],
-            minotype::T => vec![
+            Minotype::T => vec![
                 (left_x + 1, top_y),
                 (left_x, top_y + 1),
                 (left_x + 1, top_y + 1),

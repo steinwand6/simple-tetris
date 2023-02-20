@@ -17,6 +17,7 @@ use simple_tetris::{
     frame::{init_frame, Drawable, Frame},
     render::render,
     tetrimino::Tetrimino,
+    NUM_COLS, NUM_ROWS,
 };
 
 fn main() -> Result<(), Box<dyn Error>> {
@@ -49,6 +50,18 @@ fn game_play(tx: mpsc::Sender<Frame>) -> Result<(), Box<dyn Error>> {
         if !mino.moving {
             fixed_block.append(&mut mino.xy);
             mino = Tetrimino::new();
+            if mino.xy.iter().any(|(x, y)| fixed_block.contains(&(*x, *y))) {
+                for y in (0..NUM_ROWS).rev() {
+                    for x in 0..NUM_COLS {
+                        let mut curr_frame = init_frame();
+                        fixed_block.push((x, y));
+                        fixed_block.draw(&mut curr_frame);
+                        let _ = tx.send(curr_frame);
+                        thread::sleep(Duration::from_millis(10));
+                    }
+                }
+                return Ok(());
+            }
         }
         fixed_block.draw(&mut curr_frame);
 
